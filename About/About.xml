@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+	<name>[temp alpha] Simple Pathfinding</name>
+	<author>happymonkey27</author>
+	<packageId>happymonkey27.CleanPathfinding</packageId>
+	<supportedVersions>
+		<li>1.5</li>
+    </supportedVersions>
+    <description>I wanted to see if I could change how pathfinding works for the pawns</description>
+</ModMetaData>
