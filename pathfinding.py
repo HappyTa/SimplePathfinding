@@ -10,28 +10,28 @@ DIRECTIONS = [
 
 # Terrain movement costs (lower is better)
 terrain_costs = {
-    "W": float('inf'),  # WALL (impassable)
+    "W": float('inf'),  # WALL
     "D": 4,             # DIRT
-    "R": 2,             # ROAD (bias towards roads)
+    "R": 2,             # ROAD
     "T": 3              # TREE
 }
 
-def heuristic(a, b, type = 0):
+def heuristic(a, b, type = 0, weight = 1):
     if type == 0: # Manhattan
-        return abs(a.coordX - b.coordX) + abs(a.coordY - b.coordY)
+        return weight * (abs(a.coordX - b.coordX) + abs(a.coordY - b.coordY))
     elif type == 1: #Chebyshev Distance
-        return max(abs(a.coordX - b.coordX),abs(a.coordY - b.coordY))
+        return weight * max(abs(a.coordX - b.coordX),abs(a.coordY - b.coordY))
     else: # Euclidian
-        return 1.2 * math.sqrt((a.coordX - b.coordX)**2 + (a.coordY - b.coordY)**2)
+        return weight * math.sqrt((a.coordX - b.coordX)**2 + (a.coordY - b.coordY)**2)
 
-def a_star_search(grid, start, goal, type = 0, roadBias = True):
+def a_star_search(grid, start, goal, heuristicType = 0, roadBias = True, hWeight = 1):
     open_set = []
     heapq.heappush(open_set, (0, start))
     came_from = {}
     g_score = {cell: float('inf') for row in grid for cell in row}
     g_score[start] = 0
     f_score = {cell: float('inf') for row in grid for cell in row}
-    f_score[start] = heuristic(start, goal)
+    f_score[start] = heuristic(start, goal, heuristicType, hWeight)
 
     while open_set:
         _, current = heapq.heappop(open_set)
@@ -56,7 +56,7 @@ def a_star_search(grid, start, goal, type = 0, roadBias = True):
 
                 if tentative_g_score < g_score[neighbor]:
                     came_from[neighbor] = current
-                    h = heuristic(neighbor, goal, type)
+                    h = heuristic(neighbor, goal, heuristicType, hWeight)
                     g_score[neighbor] = tentative_g_score
                     f_score[neighbor] = g_score[neighbor] + h + 0.001 * h # f score is bias toward the goal
                     if neighbor not in [i[1] for i in open_set]:
