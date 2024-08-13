@@ -12,7 +12,7 @@ DIRECTIONS = [
 terrain_costs = {
     "W": float('inf'),  # WALL
     "D": 4,             # DIRT
-    "R": 2,             # ROAD
+    "R": 1,             # ROAD
     "T": 3              # TREE
 }
 
