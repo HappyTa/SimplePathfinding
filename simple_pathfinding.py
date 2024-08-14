@@ -81,9 +81,9 @@ def reset_grid():
 heuristic_type = None
 
 def main():
-    global heuristic_type
     hWeight = float(sys.argv[1])
     roadBias = sys.argv[2]
+    global heuristic_type
     heuristic_type = 0 # Default is manhattan
     roadBias = True if roadBias == "Y" else False
     

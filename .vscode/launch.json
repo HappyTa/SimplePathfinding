@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "simple_pathfinding.py",
             "console": "integratedTerminal",
-            "args": ["2", "N", "<", "world2.txt"]
+            "args": ["100", "Y", "<", "world1.txt"]
         }
     ]
 }

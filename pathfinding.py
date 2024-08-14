@@ -58,7 +58,7 @@ def a_star_search(grid, start, goal, heuristicType = 0, roadBias = True, hWeight
                     came_from[neighbor] = current
                     h = heuristic(neighbor, goal, heuristicType, hWeight)
                     g_score[neighbor] = tentative_g_score
-                    f_score[neighbor] = g_score[neighbor] + h + 0.001 * h # f score is bias toward the goal
+                    f_score[neighbor] = g_score[neighbor] + h # f score is bias toward the goal
                     if neighbor not in [i[1] for i in open_set]:
                         heapq.heappush(open_set, (f_score[neighbor], neighbor))
 
