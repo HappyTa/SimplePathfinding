@@ -1,12 +1,4 @@
-import pygame
-from simple_pathfinding import terrain_colors
-
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
-GREY = (169, 169, 169)
-BROWN = (139, 69, 19)
+import pygame, constants
 
 class Cell:
     def __init__(self, coordX, coordY, terrain_type):
@@ -21,24 +13,26 @@ class Cell:
         return False
 
     def __lt__(self, other):
-        """Less than comparison, which can be used for sorting or in priority queues."""
+        """Less than comparison, added so this can be compare in a queue"""
         if isinstance(other, Cell):
             return (self.coordX, self.coordY) < (other.coordX, other.coordY)
         return False
 
     def __hash__(self):
-        """Allows the Cell to be used in sets or as keys in dictionaries."""
+        """Hasshin capabilities"""
         return hash((self.coordX, self.coordY))
 
     def __repr__(self):
-        """Readable representation for debugging."""
         return f"Cell({self.coordX}, {self.coordY}, {self.terrain_type})"
 
     def draw(self, screen, cell_size):
-        color = terrain_colors[self.terrain_type]
+        """Function to draw the cell"""
+        color = constants.terrain_colors[self.terrain_type]
         rect = pygame.Rect(self.coordX * cell_size, self.coordY * cell_size, cell_size, cell_size)
         pygame.draw.rect(screen, color, rect)
 
+
+        """Readable representation for debugging."""
 
 class Pawn:
     def __init__(self, currentPosition: Cell):
