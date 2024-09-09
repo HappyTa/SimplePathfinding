@@ -1,4 +1,4 @@
-import pygame, sys, constants
+import pygame, sys, constants, settings
 from world_information import *
 from pathfinding import * 
 
@@ -39,7 +39,9 @@ def draw_button(text, x, y, width, height, color, hover_color, action=None):
     if x < mouse[0] < x + width and y < mouse[1] < y + height:
         pygame.draw.rect(screen, hover_color, (x, y, width, height))
         if click[0] == 1 and action is not None:
+            pygame.draw.rect(screen, constants.BUTTON_SELECT_COLOR, (x, y, width, height))
             action()
+            pygame.time.delay(200)
     else:
         pygame.draw.rect(screen, color, (x, y, width, height))
 
@@ -48,18 +50,18 @@ def draw_button(text, x, y, width, height, color, hover_color, action=None):
     text_rect = text_surf.get_rect(center=(x + width // 2, y + height // 2))
     screen.blit(text_surf, text_rect)
 
+def draw_label(text, x, y):
+    font = pygame.font.Font(None, 36)
+    text_surf = font.render(text, True, constants.WHITE)
+    # global screen
+    screen.blit(text_surf, (x, y))
+
 def reset_grid():
     return None, None, []  # Reset start, end, and path
 
-heuristic_type = None
-
+# heuristic_type = None
 def main():
-    hWeight = float(sys.argv[1])
-    roadBias = sys.argv[2]
-    global heuristic_type
-    heuristic_type = 0 # Default is manhattan
-    roadBias = True if roadBias == "Y" else False
-    
+    settings.hWeight = float(sys.argv[1])
     grid_size, grid = load_map()
 
     # Adjust screen size based on grid size
@@ -79,7 +81,6 @@ def main():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouseX, mouseY = event.pos
                 gridX, gridY = mouseX // constants.CELL_SIZE, mouseY // constants.CELL_SIZE
-
                 
                 # Making sure that the user is clicking on the map    
                 if 0 <= gridX < grid_size and 0 <= gridY < grid_size:
@@ -93,7 +94,13 @@ def main():
                     # Only do the search if both start and finish is chosen
                     # Need to add functionality that notify the user if the path is impossibble
                     if start is not None and end is not None:
-                        path = a_star_search(grid, start, end, heuristicType=heuristic_type, roadBias=roadBias, hWeight=hWeight)  # Find path when both start and end are selected
+                        path = a_star_search(grid, 
+                                             start, 
+                                             end, 
+                                             heuristicType=settings.heuristic_type, 
+                                             roadBias=settings.road_bias, 
+                                             straightBias=settings.straight_bias, 
+                                             hWeight=settings.hWeight)  # Find path when both start and end are selected
 
             # Reset key
             elif event.type == pygame.KEYDOWN:
@@ -119,17 +126,17 @@ def main():
         if end:
             pygame.draw.rect(screen, constants.YELLOW, (end.coordX * constants.CELL_SIZE, end.coordY * constants.CELL_SIZE, constants.CELL_SIZE, constants.CELL_SIZE))
 
-        # Draw buttons for heuristic selection
+        # Draw buttons
         draw_button("Manhattan", 
-                    grid_size * constants.CELL_SIZE + constants.BUTTON_MARGIN, 
+                    grid_size * constants.CELL_SIZE + constants.BUTTON_MARGIN - 15, 
                     10, 
                     constants.BUTTON_WIDTH, 
                     constants.BUTTON_HEIGHT, 
                     constants.BUTTON_COLOR, 
                     constants.BUTTON_HOVER_COLOR, 
-                    lambda: set_heuristic(0) )
+                    lambda : set_heuristic(0) )
         draw_button("Chebyshev", 
-                    grid_size * constants.CELL_SIZE + constants.BUTTON_MARGIN, 
+                    grid_size * constants.CELL_SIZE + constants.BUTTON_MARGIN - 15, 
                     constants.BUTTON_HEIGHT + 20, 
                     constants.BUTTON_WIDTH, 
                     constants.BUTTON_HEIGHT, 
@@ -137,22 +144,59 @@ def main():
                     constants.BUTTON_HOVER_COLOR, 
                     lambda: set_heuristic(1))
         draw_button("Euclidean", 
-                    grid_size * constants.CELL_SIZE + constants.BUTTON_MARGIN, 
+                    grid_size * constants.CELL_SIZE + constants.BUTTON_MARGIN - 15, 
                     2 * constants.BUTTON_HEIGHT + 30, 
                     constants.BUTTON_WIDTH, 
                     constants.BUTTON_HEIGHT, 
                     constants.BUTTON_COLOR, 
                     constants.BUTTON_HOVER_COLOR, 
                     lambda: set_heuristic(2))
+        
+        draw_button("Road Bias",
+                    grid_size * constants.CELL_SIZE + constants.BUTTON_MARGIN - (constants.BUTTON_MARGIN//2),
+                    3 * constants.BUTTON_HEIGHT + 40,
+                    constants.BUTTON_WIDTH, 
+                    constants.BUTTON_HEIGHT, 
+                    constants.BUTTON_COLOR, 
+                    constants.BUTTON_HOVER_COLOR, 
+                    lambda: set_road_bias())
+
+        draw_button("Straight Bias",
+                    grid_size * constants.CELL_SIZE + constants.BUTTON_MARGIN - (constants.BUTTON_MARGIN//2),
+                    4 * constants.BUTTON_HEIGHT + 50,
+                    constants.BUTTON_WIDTH, 
+                    constants.BUTTON_HEIGHT, 
+                    constants.BUTTON_COLOR, 
+                    constants.BUTTON_HOVER_COLOR, 
+                    lambda: set_straight_bias())
+       
+        # Draw current heuristic
+        draw_label(f"h_type: {settings.heuristic_type}", 
+                    grid_size * constants.CELL_SIZE,
+                    5 * constants.BUTTON_HEIGHT + 70)
+        # Draw labels to display road_bias and straight_bias values
+        draw_label(f"Road Bias: {'Y' if settings.road_bias == True else 'N'}", 
+                    grid_size * constants.CELL_SIZE,
+                    6 * constants.BUTTON_HEIGHT + 80)
+        draw_label(f"Straight Bias: {'Y' if settings.straight_bias == True else 'N'}",
+                    grid_size * constants.CELL_SIZE,
+                    7 * constants.BUTTON_HEIGHT + 90)
+ 
+        
 
         pygame.display.flip()
     pygame.quit()
     sys.exit()
 
 def set_heuristic(new):
-    global heuristic_type
-    if heuristic_type != new:
-        heuristic_type = new
+    if settings.heuristic_type != new:
+        settings.heuristic_type = new
+
+def set_road_bias():
+    settings.road_bias = not settings.road_bias
+
+def set_straight_bias():
+    settings.straight_bias = not settings.straight_bias
 
 if __name__ == "__main__":
     main()

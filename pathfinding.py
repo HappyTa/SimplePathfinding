@@ -2,8 +2,8 @@ import heapq, math, constants
 
 # Directions for 8-way movement
 DIRECTIONS = [
-    (-1, 0), (1, 0), (0, -1), (0, 1), 
-    (-1, -1), (1, 1), (-1, 1), (1, -1)
+    (-1, 0, 1), (1, 0, 1), (0, -1, 1), (0, 1, 1), 
+    (-1, -1, 2), (1, 1, 2), (-1, 1, 2), (1, -1, 2)
 ]
 
 # Terrain movement costs (lower is better)
@@ -22,7 +22,7 @@ def heuristic(a, b, type = 0, weight = 1):
     else: # Euclidian
         return weight * math.sqrt((a.coordX - b.coordX)**2 + (a.coordY - b.coordY)**2)
 
-def a_star_search(grid, start, goal, heuristicType = 0, roadBias = True, hWeight = 1):
+def a_star_search(grid, start, goal, heuristicType = 0, roadBias = True, straightBias = False, hWeight = 1):
     # Initialized
     open_set = []
     heapq.heappush(open_set, (0, start))
@@ -52,10 +52,15 @@ def a_star_search(grid, start, goal, heuristicType = 0, roadBias = True, hWeight
                 if neighbor.terrain_type == "W":
                     continue  # Skip walls
 
+                # We want road bias?
                 if roadBias == True:
                     tentative_g_score = g_score[current] + terrain_costs[neighbor.terrain_type]
                 else:
                     tentative_g_score = g_score[current] + 1
+
+                # We want straight path bias?
+                if straightBias == True:
+                    tentative_g_score += direction[2]
 
                 # If the currnet score is better than said neighbor
                 #   Generate new heuristic and update g_score for said neighbor and add it to the queue
