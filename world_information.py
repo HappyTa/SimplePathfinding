@@ -1,4 +1,6 @@
-import pygame, constants
+import pygame
+import constants
+
 
 class Cell:
     def __init__(self, coordX, coordY, terrain_type):
@@ -28,11 +30,13 @@ class Cell:
     def draw(self, screen, cell_size):
         """Function to draw the cell"""
         color = constants.terrain_colors[self.terrain_type]
-        rect = pygame.Rect(self.coordX * cell_size, self.coordY * cell_size, cell_size, cell_size)
+        rect = pygame.Rect(
+            self.coordX * cell_size, self.coordY * cell_size, cell_size, cell_size
+        )
         pygame.draw.rect(screen, color, rect)
 
-
         """Readable representation for debugging."""
+
 
 class Pawn:
     def __init__(self, currentPosition: Cell):
@@ -41,4 +45,4 @@ class Pawn:
     def move(self, direction):
         self.currentPostion.coordX += direction[0]
         self.currentPostion.coordY += direction[1]
-        
+
